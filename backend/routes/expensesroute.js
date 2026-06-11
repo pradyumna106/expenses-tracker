@@ -4,27 +4,25 @@ const Expense = require('../model/expenses.db');
 // create expense
 route.post('/add', async (req, res) => {
     try {
-        const { expenseName, amount, date, description } = req.body;
-        const expense = await Expense.create({ expenseName, amount, date, description }); 
+        const { expenseName, amount, date, description, userId } = req.body;
+        const expense = await Expense.create({ expenseName, amount, date, description, userId }); 
         res.status(201).json(expense);
-        console.log('Expense created successfully:', expense);
     } catch(err) {
         res.status(500).json({ error: err.message });
     }  
 });
 
-// get all
-route.get('/all', async (req, res) => {
+// get expenses BY USER ID
+route.get('/user/:userId', async (req, res) => {
     try {
-        // Sorts by date descending (newest first)
-        const expenses = await Expense.find().sort({ date: -1 });
+        const expenses = await Expense.find({ userId: req.params.userId }).sort({ date: -1 });
         res.status(200).json(expenses);
     } catch(err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// get update 
+// get update expense 
 route.get('/:id', async (req, res) => {
     try {
         const expense = await Expense.findById(req.params.id);  
@@ -38,7 +36,7 @@ route.get('/:id', async (req, res) => {
     }
 });
 
-// get delete 
+// get delete expense by id
 route.delete('/:id', async (req, res) => {
     try {
         const expense = await Expense.findByIdAndDelete(req.params.id); 
